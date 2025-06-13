@@ -29,7 +29,7 @@ document.getElementById("nombre").addEventListener("input", function() {
 
 document.getElementById("apellido").addEventListener("input", function() {
   const v = this.value.trim();
-  if (v.length < 3 && v.length < 3) {
+  if (v.length < 3) {
     mostrarError("errorApellido", "Apellido no valido");
     marcarCampo(this, false);
     estadoValidacion["apellido"] = false;
@@ -41,15 +41,29 @@ document.getElementById("apellido").addEventListener("input", function() {
 
 });
 
+const campoCorreo = document.getElementById("correo");
+const campoConfirmarCorreo = document.getElementById("confirmarCorreo");
+
+["copy", "cut", "paste"].forEach(evt => {
+  campoCorreo.addEventListener(evt, e => e.preventDefault());
+  campoConfirmarCorreo.addEventListener(evt, e => {
+    e.preventDefault();
+    alert(" No se permite pegar el correo.");
+  });
+});
+
+
 // Validación del email
 document.getElementById("correo").addEventListener("input", function () {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,}$/;
   if (!emailRegex.test(this.value)) {
     mostrarError("errorCorreo", "Formato de email inválido");
     marcarCampo(this, false);
+    estadoValidacion["correo"] = false;
   } else {
     mostrarExito("exitoCorreo", "✓ Email válido");
     marcarCampo(this, true);
+    estadoValidacion["correo"] = true;
   }
 });
 
@@ -62,9 +76,11 @@ document.getElementById("confirmarCorreo").addEventListener("input", function ()
   if (confirmar !== correo) {
     mostrarError("errorConfirmarCorreo", "Los correos no coinciden");
     marcarCampo(this, false);
+    estadoValidacion["confirmarCorreo"] = false;
   } else if (confirmar.length > 0) {
     mostrarExito("exitoConfirmarCorreo", "✓ Correos coinciden");
     marcarCampo(this, true);
+    estadoValidacion["confirmarCorreo"] = true;
   }
 });
 
@@ -103,9 +119,11 @@ document
     if (this.value !== password) {
       mostrarError("errorConfirmar", "Las contraseñas no coinciden");
       marcarCampo(this, false);
+      estadoValidacion["confirmarPassword"] = false;
     } else if (this.value.length > 0) {
       mostrarExito("exitoConfirmar", "✓ Contraseñas coinciden");
       marcarCampo(this, true);
+      estadoValidacion["confirmarPassword"] = true;
     }
   });
 
@@ -156,7 +174,7 @@ document
 
 // Comentarios
 document.getElementById("comentarios").addEventListener("input", function () {
-  const contador = document.getElementById("contadorComentarios");
+  const contador = document.getElementById("contadorCaracteres");
   contador.textContent = this.value.length;
 
   contador.style.color =
@@ -165,6 +183,8 @@ document.getElementById("comentarios").addEventListener("input", function () {
       : this.value.length > 400
       ? "#ffc107"
       : "#666";
+
+  estadoValidacion["comentarios"] = true;
   marcarCampo(this, true);
 });
 
@@ -173,9 +193,11 @@ document.getElementById("terminos").addEventListener("change", function () {
   if (!this.checked) {
     mostrarError("errorTerminos", "Debes aceptar los términos y condiciones");
     marcarCampo(this, false);
+    estadoValidacion["terminos"] = false;
   } else {
     ocultarMensaje("errorTerminos");
     marcarCampo(this, true);
+    estadoValidacion["terminos"] = true;
   }
 });
 
@@ -269,8 +291,10 @@ formulario.addEventListener("submit", function (e) {
 
 function obtenerNombreCampo(campo) {
   const nombres = {
-    nombreCompleto: "Nombre completo",
+    nombre: "Nombre:",
+    apellido: "Apellidos:",
     correo: "Correo electrónico",
+    confirmarCorreo: "Confirmacion de correo",
     password: "Contraseña",
     confirmarPassword: "Confirmación de contraseña",
     telefono: "Teléfono",
@@ -289,7 +313,7 @@ function reiniciarFormulario() {
     estadoValidacion[campo] = false;
   });
 
-  campos.forEach((campo) => campo.classList.remove("valido", "invalido"));
+  campos.forEach((campo) => campo.classList.remove("valido", " Invalido"));
 
   document.querySelectorAll(".mensaje-error, .mensaje-exito").forEach((m) => {
     m.style.display = "none";
